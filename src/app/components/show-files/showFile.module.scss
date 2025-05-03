@@ -1,0 +1,78 @@
+.mainContainer {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.imagesGrid {
+  width: 80%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+  justify-content: center;
+}
+
+.fileItem {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fileItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.fileBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 200px;
+  background-color: #333;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.fileBox:hover {
+  background-color: #7b7b7b;
+}
+
+.fileIcon {
+  font-size: 50px;
+  color: #b4b4b4;
+}
+
+.fileName {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #bcbcbc;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 90%;
+}
+
+@media (min-width: 1024px) {
+  .imagesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1023px) and (min-width: 768px) {
+  .imagesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .imagesGrid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
