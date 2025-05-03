@@ -12,3 +12,8 @@ interface GithubAuth {
 interface Progress {
   progress: number;
 }
+
+interface ParentId {
+  parentId?: string;
+  user?: string;
+}

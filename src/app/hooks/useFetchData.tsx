@@ -1,22 +1,40 @@
 import { useEffect, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { database } from "@/firebaseConfig";
 
-const useFetchData = (collectionName: string) => {
+const useFetchData = (
+  collectionName: string,
+  parentId?: string,
+  user?: string
+) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<null | string>(null);
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      setData([]);
+      return;
+    }
+
+    const colRef = collection(database, collectionName);
+
+    const q = query(
+      colRef,
+      where("parentId", "==", parentId ?? ""),
+      where("userEmail", "==", user)
+    );
+
     const unsubscribe = onSnapshot(
-      collection(database, collectionName),
+      q,
       (snapshot) => {
         const docsData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setData(docsData);
-        setLoading(false); // Set loading to false once data is received
+        setLoading(false);
       },
       (err) => {
         setError(err.message || "Failed to fetch data");
@@ -24,9 +42,8 @@ const useFetchData = (collectionName: string) => {
       }
     );
 
-    // Cleanup the listener when the component unmounts or collectionName changes
     return () => unsubscribe();
-  }, [collectionName]); // Only re-run if collectionName changes
+  }, [collectionName, parentId, user]);
 
   return { data, loading, error };
 };

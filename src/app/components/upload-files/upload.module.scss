@@ -2,8 +2,15 @@
   margin-left: 20px;
 }
 
+.folderInput {
+  width: 20%;
+}
+
 @media screen and (max-width: 640px) {
   .inputFile {
+    margin-left: 20px;
+  }
+  .folderInput {
     margin-left: 20px;
   }
 }

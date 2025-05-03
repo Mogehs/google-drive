@@ -7,13 +7,6 @@ import Image from "next/image";
 
 const TopBar = () => {
   const { session } = useFetchSession();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
     <div className={styles.authBtn}>
@@ -21,8 +14,8 @@ const TopBar = () => {
         <Image
           src={session.user.image}
           alt="User Profile Image"
-          width={40}
-          height={40}
+          width={70}
+          height={70}
           className={styles.profileImg}
           onClick={() => signOut()}
           priority
