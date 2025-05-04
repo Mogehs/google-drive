@@ -21,7 +21,8 @@ const UploadFiles = ({ parentId, user }: ShowFiles) => {
 
     try {
       const { url, name } = await uploadFile(file, setProgress);
-      addFile(url, name, parentId, user);
+      const sharedTo: object = [];
+      addFile(url, name, parentId, user, sharedTo);
     } catch (err) {
       console.error("Upload error:", err);
     }
@@ -41,6 +42,7 @@ const UploadFiles = ({ parentId, user }: ShowFiles) => {
       folderName: folderName,
       isFolder: true,
       filesList: [],
+      sharedTo: [],
       parentId: parentId || "",
       userEmail: user || "",
     };
@@ -90,11 +92,7 @@ const UploadFiles = ({ parentId, user }: ShowFiles) => {
         )}
       </div>
       <div className={styles.progressMain}>
-        {progress && progress !== 100 ? (
-          <Progress progress={progress} />
-        ) : (
-          <></>
-        )}
+        {progress && progress != 100 ? <Progress progress={progress} /> : <></>}
       </div>
     </>
   );

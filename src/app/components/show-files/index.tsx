@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import useFetchData from "@/app/hooks/useFetchData";
 import styles from "./showFile.module.scss";
-import { FaFileImage } from "react-icons/fa";
+import { FaFileImage, FaEllipsisV } from "react-icons/fa";
 import { FaFolder } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { shareItem } from "@/app/utils/firestore";
 
 interface ShowFilesProps {
   parentId?: string;
@@ -15,6 +16,28 @@ interface ShowFilesProps {
 const ShowFiles = ({ parentId, user }: ShowFilesProps) => {
   const { data, loading, error } = useFetchData("files", parentId, user);
   const router = useRouter();
+
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [email, setEmail] = useState("");
+
+  const openModal = (item: any) => {
+    setSelectedItem(item);
+    (document.getElementById("email_modal") as HTMLInputElement).checked = true;
+  };
+
+  const handleSubmit = async () => {
+    if (selectedItem && email) {
+      try {
+        await shareItem(selectedItem.id, email);
+        alert("Shared successfully!");
+      } catch (err) {
+        alert("Error sharing item.");
+      }
+      setEmail("");
+      (document.getElementById("email_modal") as HTMLInputElement).checked =
+        false;
+    }
+  };
 
   if (loading)
     return (
@@ -39,26 +62,28 @@ const ShowFiles = ({ parentId, user }: ShowFilesProps) => {
       <ul className={styles.imagesGrid}>
         {/* Folders */}
         {folders.map((folder: any) => (
-          <li
-            key={folder.id}
-            className={styles.fileItem}
-            onClick={() => router.push(`/folder?id=${folder.id}`)}
-          >
-            <div className={styles.fileBox}>
+          <li key={folder.id} className={styles.fileItem}>
+            <div
+              className={styles.fileBox}
+              onClick={() => router.push(`/folder?id=${folder.id}`)}
+            >
               <FaFolder className={styles.fileIcon} color="#facc15" />
               <p className={styles.fileName}>{folder.folderName || "Folder"}</p>
             </div>
+            <FaEllipsisV
+              className="text-gray-400 cursor-pointer mt-1"
+              onClick={() => openModal(folder)}
+            />
           </li>
         ))}
 
         {/* Files */}
         {files.map((file: any) => (
-          <li
-            key={file.id}
-            className={styles.fileItem}
-            onClick={() => handleFileClick(file.imageLink)}
-          >
-            <div className={styles.fileBox}>
+          <li key={file.id} className={styles.fileItem}>
+            <div
+              className={styles.fileBox}
+              onClick={() => handleFileClick(file.imageLink)}
+            >
               <Image
                 src={file.imageLink}
                 alt={file.imageName}
@@ -68,9 +93,42 @@ const ShowFiles = ({ parentId, user }: ShowFilesProps) => {
               />
               <p className={styles.fileName}>{file.imageName}</p>
             </div>
+            <FaEllipsisV
+              className="text-gray-400 cursor-pointer mt-1"
+              onClick={() => openModal(file)}
+            />
           </li>
         ))}
       </ul>
+
+      {/* Shared Modal */}
+      <input type="checkbox" id="email_modal" className="modal-toggle" />
+      <div className="modal" role="dialog">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">
+            Share {selectedItem?.folderName || selectedItem?.imageName}
+          </h3>
+          <p className="py-2">Enter an email to share:</p>
+          <input
+            type="email"
+            placeholder="example@example.com"
+            className="input input-bordered w-full"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <div className="modal-action">
+            <label className="btn btn-primary" onClick={handleSubmit}>
+              Share
+            </label>
+            <label htmlFor="email_modal" className="btn">
+              Cancel
+            </label>
+          </div>
+        </div>
+        <label className="modal-backdrop" htmlFor="email_modal">
+          Close
+        </label>
+      </div>
     </div>
   );
 };
