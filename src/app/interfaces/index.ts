@@ -13,7 +13,7 @@ interface Progress {
   progress: number;
 }
 
-interface ParentId {
+interface ShowFiles {
   parentId?: string;
   user?: string;
 }
