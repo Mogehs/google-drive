@@ -7,7 +7,7 @@ import { uploadFile } from "@/app/utils/uploadFile";
 import { addFile, addFolder } from "@/app/utils/firestore";
 import Progress from "../common/progress/Progress";
 
-const UploadFiles = ({ parentId, user }: ParentId) => {
+const UploadFiles = ({ parentId, user }: ShowFiles) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isFolderVisible, setIsFolderVisible] = useState(false);
   const [folderName, setFolderName] = useState<string>("");

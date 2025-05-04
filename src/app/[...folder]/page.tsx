@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import ShowFiles from "../components/show-files/page";
-import TopBar from "../components/topbar/page";
-import UploadFiles from "../components/upload-files/page";
+import ShowFiles from "../components/show-files";
+import TopBar from "../components/topbar";
+import UploadFiles from "../components/upload-files";
 import { useSearchParams } from "next/navigation";
 import useFetchSession from "../hooks/useSession";
 
