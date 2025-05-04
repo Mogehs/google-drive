@@ -18,42 +18,44 @@ const useFetchData = (
       return;
     }
 
+    setLoading(true);
+    setData([]); // ✅ Clear old data on dependency change
+
     const colRef = collection(database, collectionName);
 
-    // Query 1: Items created by the user
+    // Items created by the user
     const q1 = query(
       colRef,
       where("parentId", "==", parentId ?? ""),
       where("userEmail", "==", user)
     );
 
-    // Query 2: Items shared with the user
+    // Items shared with the user
     const q2 = query(
       colRef,
       where("parentId", "==", parentId ?? ""),
       where("sharedTo", "array-contains", user)
     );
 
-    const combinedData: any[] = [];
-    let unsub1: () => void;
-    let unsub2: () => void;
+    let ownedItems: any[] = [];
+    let sharedItems: any[] = [];
 
-    unsub1 = onSnapshot(
+    const mergeAndSet = () => {
+      const merged = [...ownedItems, ...sharedItems].filter(
+        (item, index, self) => index === self.findIndex((i) => i.id === item.id)
+      );
+      setData(merged);
+      setLoading(false);
+    };
+
+    const unsub1 = onSnapshot(
       q1,
       (snapshot) => {
-        const docs = snapshot.docs.map((doc) => ({
+        ownedItems = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        combinedData.push(...docs);
-        setData((prev) => {
-          const merged = [
-            ...docs,
-            ...prev.filter((p) => !docs.some((d) => d.id === p.id)),
-          ];
-          return merged;
-        });
-        setLoading(false);
+        mergeAndSet();
       },
       (err) => {
         setError(err.message || "Failed to fetch owned items");
@@ -61,22 +63,14 @@ const useFetchData = (
       }
     );
 
-    unsub2 = onSnapshot(
+    const unsub2 = onSnapshot(
       q2,
       (snapshot) => {
-        const docs = snapshot.docs.map((doc) => ({
+        sharedItems = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        combinedData.push(...docs);
-        setData((prev) => {
-          const merged = [
-            ...prev,
-            ...docs.filter((d) => !prev.some((p) => p.id === d.id)),
-          ];
-          return merged;
-        });
-        setLoading(false);
+        mergeAndSet();
       },
       (err) => {
         setError(err.message || "Failed to fetch shared items");
@@ -85,8 +79,8 @@ const useFetchData = (
     );
 
     return () => {
-      unsub1 && unsub1();
-      unsub2 && unsub2();
+      unsub1();
+      unsub2();
     };
   }, [collectionName, parentId, user]);
 
