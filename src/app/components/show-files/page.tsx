@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import useFetchData from "@/app/hooks/useFetchData";
 import styles from "./showFile.module.scss";
