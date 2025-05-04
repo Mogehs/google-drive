@@ -7,7 +7,12 @@ import { FaFolder } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const ShowFiles = ({ parentId, user }: ShowFiles) => {
+interface ShowFilesProps {
+  parentId?: string;
+  user?: string;
+}
+
+const ShowFiles = ({ parentId, user }: ShowFilesProps) => {
   const { data, loading, error } = useFetchData("files", parentId, user);
   const router = useRouter();
 
@@ -22,24 +27,22 @@ const ShowFiles = ({ parentId, user }: ShowFiles) => {
 
   if (error) return <p>Error: {error}</p>;
 
+  const folders = data.filter((item: any) => item.isFolder);
+  const files = data.filter((item: any) => !item.isFolder);
+
   const handleFileClick = (link: string) => {
     window.open(link, "_blank");
   };
 
-  const folders = data.filter((item: any) => item.isFolder);
-  const files = data.filter((item: any) => !item.isFolder);
-
   return (
     <div className={styles.mainContainer}>
       <ul className={styles.imagesGrid}>
-        {/* Show Folders First */}
+        {/* Folders */}
         {folders.map((folder: any) => (
           <li
             key={folder.id}
             className={styles.fileItem}
-            onClick={() => {
-              router.push(`/folder?id=${folder.id}`);
-            }}
+            onClick={() => router.push(`/folder?id=${folder.id}`)}
           >
             <div className={styles.fileBox}>
               <FaFolder className={styles.fileIcon} color="#facc15" />
@@ -48,7 +51,7 @@ const ShowFiles = ({ parentId, user }: ShowFiles) => {
           </li>
         ))}
 
-        {/* Show Files */}
+        {/* Files */}
         {files.map((file: any) => (
           <li
             key={file.id}
@@ -56,12 +59,11 @@ const ShowFiles = ({ parentId, user }: ShowFiles) => {
             onClick={() => handleFileClick(file.imageLink)}
           >
             <div className={styles.fileBox}>
-              {/* <FaFileImage className={styles.fileIcon} /> */}
               <Image
                 src={file.imageLink}
                 alt={file.imageName}
-                width="100"
-                height="100"
+                width={100}
+                height={100}
                 className="w-20 h-20"
               />
               <p className={styles.fileName}>{file.imageName}</p>
